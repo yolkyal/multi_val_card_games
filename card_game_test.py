@@ -9,8 +9,7 @@ class TestCardGame(unittest.TestCase):
 	def setUp(self):
 		self.player1 = Player('Player 1')
 		self.player2 = Player('Player 2')
-		self.players = [self.player1, self.player2]
-		self.game = MultiValCardGame(self.players)
+		self.game = MultiValCardGame([self.player1, self.player2])
 
 	def test_deal_cards(self):
 		players = [Player('Player 1', []), Player('Player 2', [])]
@@ -51,7 +50,7 @@ class TestCardGame(unittest.TestCase):
 		self.assertEqual(completed_round.winning_action, Action(self.player1, Card(1, 3)))
 
 		self.assertEqual(self.player1.cards, [])
-		self.assertEquals(self.player2.cards, [])
+		self.assertEqual(self.player2.cards, [])
 
 	def test_apply_action_with_different_types(self):
 		self.player1 = Player('Player 1', [Card(2, 1), Card(1, 3)])
@@ -74,7 +73,25 @@ class TestCardGame(unittest.TestCase):
 		self.assertEqual(completed_round.winning_action, Action(self.player2, Card(2, 2)))
 
 		self.assertEqual(self.player1.cards, [])
-		self.assertEquals(self.player2.cards, [])
+		self.assertEqual(self.player2.cards, [])
+
+	def test_get_winning_player(self):
+		self.player1 = Player('Player 1', [Card(1, 4), Card(1, 3)])
+		self.player2 = Player('Player 2', [Card(1, 2), Card(1, 1)])
+
+		self.game.round_start()
+		self.game.apply_action(Action(self.player1, Card(1, 4)))
+		self.game.apply_action(Action(self.player2, Card(1, 2)))
+		self.game.round_end()
+
+		self.assertEqual(self.game.get_winner(), self.player1)
+
+		self.game.round_start()
+		self.game.apply_action(Action(self.player1, Card(1, 3)))
+		self.game.apply_action(Action(self.player2, Card(1, 1)))
+		self.game.round_end()
+
+		self.assertEqual(self.game.get_winner(), self.player1)
 
 if __name__ == '__main__':
 	unittest.main()

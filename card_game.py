@@ -1,10 +1,11 @@
 import random
-
+from collections import Counter
 
 class Player:
-	def __init__(self, _id, cards=None):
+	def __init__(self, _id, cards=None, tactic=None):
 		self._id = _id
 		self.cards = cards if cards else []
+		self.tactic = tactic
 
 	def __eq__(self, other):
 		return self._id == other._id
@@ -75,11 +76,16 @@ class MultiValCardGame:
 	def apply_action(self, action):
 		if not self.active_round:
 			raise NoActiveRoundException()
+
 		if action.card in action.player.cards:
 			action.player.cards.remove(action.card)
 			self.active_round.apply_action(action)
 		else:
-			raise ValueError(str(action.player) + ' does not have ' + str(action.card))
+			raise ValueError(str(action.player) + ' does not have card ' + str(action.card))
+
+	def get_winner(self):
+		counter = Counter(round.winning_action.player for round in self.completed_rounds)
+		return counter.most_common(1)[0][0]
 
 	def __str__(self):
 		return str([(str(player), [str(card) for card in player.cards]) for player in self.players])
